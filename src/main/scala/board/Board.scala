@@ -2,18 +2,18 @@ package board
 
 import grid.Grid.ShotResult._
 
-trait Board[T] {
-  type ShotType
-
-  def board: Vector[Vector[T]]
-
-  def playerBoard: Vector[Vector[T]]
-
-  def enemyBoard: Vector[Vector[T]]
-
-  def processShoot(salvo: List[ShotType]): List[(ShotType, ShotResult)]
-
+trait Board[ShotType, FieldView] {
+  def board: Vector[Vector[FieldView]]
+  def size: (Int, Int)
   def board2String = board.map(_.mkString).mkString("\n")
 }
 
-class HexBoardCoordinateException(mes: String) extends Exception(mes)
+trait PlayerBoard[ShotType, FieldView] extends Board[ShotType, FieldView] {
+  def shipsAlive: Int
+  def processSalvo(salvo: List[ShotType]): List[(ShotType, ShotResult)]
+}
+
+trait EnemyBoard[ShotType, FieldView] extends Board[ShotType, FieldView] {
+  def shipsKilled: Int
+  def processShotResults(results: List[(ShotType, ShotResult)])
+}

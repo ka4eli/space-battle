@@ -1,12 +1,14 @@
 package grid
 
 trait Grid {
-  import Grid._
   import Grid.ShotResult.ShotResult
+  import Grid._
 
   def size: (Int, Int)
   def ships: Set[Ship]
   def shoot(salvo: List[Shot]): List[(Shot, ShotResult)]
+  def missed: Set[Shot]
+  def hit: Set[Shot]
 }
 
 object Grid {
@@ -18,5 +20,3 @@ object Grid {
     val Hit, Kill, Miss = Value
   }
 }
-
-class GridInitException(mes: String) extends Exception(mes)

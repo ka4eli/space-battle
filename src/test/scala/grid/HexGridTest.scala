@@ -1,34 +1,34 @@
 package grid
 
-
+import exceptions.GridInitException
 import grid.Grid.ShotResult._
 import org.scalatest._
 
-class DefaultGridTest extends FlatSpec with Matchers {
+class HexGridTest extends FlatSpec with Matchers {
 
   val ships = Set(Set((1, 1), (2, 2)), Set((3, 3)), Set((15, 15)))
 
-  def grid = new DefaultGrid(ships, 16, 16)
+  def grid = new HexGrid(ships)
 
-  "Shoot" should "return hit" in {
+  "shoot" should "return hit" in {
     val salvo = List((2, 2))
     val res = grid.shoot(salvo)
     res.head._2 should be(Hit)
   }
 
-  "Shoot" should "return kill" in {
+  "shoot" should "return kill" in {
     val salvo = List((1, 1), (2, 2), (2, 3), (3, 3))
     val res = grid.shoot(salvo)
     res(1)._2 should be(Kill)
   }
 
-  "Shoot" should "return miss" in {
+  "shoot" should "return miss" in {
     val salvo = List((2, 3))
     val res = grid.shoot(salvo)
     res.head._2 should be(Miss)
   }
 
-  "Shoot" should "return miss when was already hit" in {
+  "shoot" should "return miss when was already hit" in {
     val g = grid
     val res1 = g.shoot(List((2, 2)))
     res1.head._2 should be(Hit)
@@ -41,8 +41,7 @@ class DefaultGridTest extends FlatSpec with Matchers {
     res3(1)._2 should be(Miss)
   }
 
-
-  "Shoot" should "return miss when was already killed" in {
+  "shoot" should "return miss when was already killed" in {
     val g = grid
     val res1 = g.shoot(List((15, 15)))
     res1.head._2 should be(Kill)
@@ -55,7 +54,7 @@ class DefaultGridTest extends FlatSpec with Matchers {
     res3(1)._2 should be(Miss)
   }
 
-  "Ships" should "be the same after miss" in {
+  "ships" should "be the same after miss" in {
     val g = grid
     val salvo = List((2, 3))
     val res = g.shoot(salvo)
@@ -63,7 +62,7 @@ class DefaultGridTest extends FlatSpec with Matchers {
     g.ships should be(ships)
   }
 
-  "Ships" should "be updated after hit" in {
+  "ships" should "be updated after hit" in {
     val g = grid
     val salvo = List((1, 1))
     val res = g.shoot(salvo)
@@ -71,7 +70,7 @@ class DefaultGridTest extends FlatSpec with Matchers {
     g.ships should be(ships.map(_ - salvo.head))
   }
 
-  "Ships" should "be updated after kill" in {
+  "ships" should "be updated after kill" in {
     val g = grid
     val salvo = List((15, 15))
     val res = g.shoot(salvo)
@@ -79,10 +78,11 @@ class DefaultGridTest extends FlatSpec with Matchers {
     g.ships should be(ships.map(_ - salvo.head).filterNot(_.isEmpty))
   }
 
-  "Ships beyond borders" should "throw GridInitException" in {
-    intercept[GridInitException]{
+  "ships beyond borders" should "throw GridInitException" in {
+    intercept[GridInitException] {
       val ships = Set(Set((1, 1), (2, 2)), Set((3, 3)), Set((16, 15)))
       new DefaultGrid(ships, 16, 16)
     }
   }
+
 }

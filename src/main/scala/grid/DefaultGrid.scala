@@ -1,31 +1,45 @@
 package grid
 
-import grid.Grid.Shot
-import grid.Grid.Ship
+import exceptions.GridInitException
 import grid.Grid.ShotResult._
+import grid.Grid.{Ship, Shot}
 
-class DefaultGrid(var ships: Set[Ship], rows: Int, columns: Int) extends Grid {
+class DefaultGrid(shipsSet: Set[Ship], rows: Int, columns: Int) extends Grid {
   val size = (rows, columns)
 
-  if (!ships.forall(_.forall(x => x._1 >= 0 && x._1 < rows && x._2 >= 0 && x._2 < columns))) {
-    throw new GridInitException(s"Can't accommodate ships $ships on grid with size $size")
+  private var _ships = shipsSet
+  private var hitSet = Set.empty[Shot]
+  private var missedSet = Set.empty[Shot]
+
+  def hit = hitSet
+
+  def missed = missedSet
+
+  def ships = _ships
+
+  if (!_ships.forall(_.forall(x => x._1 >= 0 && x._1 < rows && x._2 >= 0 && x._2 < columns))) {
+    throw new GridInitException(s"Can't accommodate ships ${_ships} on grid with size $size")
   }
 
   def shoot(salvo: List[Shot]): List[(Shot, ShotResult)] = salvo.flatMap { shot =>
-    ships.filter(_.contains(shot)) map { ship =>
+    _ships.filter(_.contains(shot)) map { ship =>
       val newShip = ship - shot
       val shotResult =
         if ((newShip.size < ship.size) && newShip.isEmpty) {
-          ships = ships.filter(!_.contains(shot))
+          _ships = _ships.filter(!_.contains(shot))
+          hitSet += shot
           Kill
         }
         else {
-          ships = ships.filter(!_.contains(shot)) + newShip
+          _ships = _ships.filter(!_.contains(shot)) + newShip
+          hitSet += shot
           Hit
         }
       (shot, shotResult)
     } match {
-      case s: Set[_] if s.isEmpty => Set((shot, Miss))
+      case s: Set[_] if s.isEmpty =>
+        missedSet += shot
+        Set((shot, Miss))
       case s => s
     }
   }
