@@ -1,6 +1,6 @@
 package grid
 
-import exceptions.GridInitException
+import exception.GridInitException
 import grid.Grid.ShotResult._
 import org.scalatest._
 

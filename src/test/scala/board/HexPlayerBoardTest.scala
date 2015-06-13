@@ -1,6 +1,6 @@
 package board
 
-import _root_.exceptions.HexConversionException
+import _root_.exception.HexConversionException
 import grid.Grid.ShotResult._
 import grid.HexGrid
 import org.scalatest._

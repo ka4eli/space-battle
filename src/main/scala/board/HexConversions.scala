@@ -1,6 +1,6 @@
 package board
 
-import exceptions.HexConversionException
+import exception.HexConversionException
 
 trait HexConversions {
   type Hex = String

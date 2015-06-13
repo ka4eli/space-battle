@@ -1,4 +1,4 @@
-package exceptions
+package exception
 
 
 class HexConversionException(mes: String) extends Exception(mes)
