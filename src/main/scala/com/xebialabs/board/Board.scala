@@ -1,6 +1,6 @@
-package board
+package com.xebialabs.board
 
-import grid.Grid.ShotResult._
+import com.xebialabs.grid.Grid.ShotResult._
 
 trait Board[ShotType, FieldView] {
   def board: Vector[Vector[FieldView]]
@@ -10,6 +10,7 @@ trait Board[ShotType, FieldView] {
 
 trait PlayerBoard[ShotType, FieldView] extends Board[ShotType, FieldView] {
   def shipsAlive: Int
+  def shipsKilled: Int
   def processSalvo(salvo: List[ShotType]): List[(ShotType, ShotResult)]
 }
 

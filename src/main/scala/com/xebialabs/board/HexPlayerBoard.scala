@@ -1,7 +1,7 @@
-package board
+package com.xebialabs.board
 
-import grid.Grid.ShotResult._
-import grid.HexGrid
+import com.xebialabs.grid.Grid.ShotResult._
+import com.xebialabs.grid.HexGrid
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -12,6 +12,8 @@ class HexPlayerBoard(grid: HexGrid) extends PlayerBoard[String, String] with Hex
 
   def shipsAlive = grid.ships.size
 
+  def shipsKilled = grid.killed
+
   def processSalvo(salvo: List[String]): List[(String, ShotResult)] =
     grid.shoot(salvo.map(hexToShot)).map(p => (shotToHex(p._1), p._2))
 
@@ -20,4 +22,10 @@ class HexPlayerBoard(grid: HexGrid) extends PlayerBoard[String, String] with Hex
     alive.foreach(x => buf(x._1)(x._2) = "*")
     buf.map(_.toVector).toVector
   }
+
+  override def board2String = (Vector((0 to size._1 - 1).map(intToHex).toVector) ++ board).zipWithIndex.map {
+    case x if x._2 != 0 => intToHex(x._2 - 1) +: x._1
+    case x => "#" +: x._1
+  }.map(_.mkString(" ")).mkString("\n")
+
 }

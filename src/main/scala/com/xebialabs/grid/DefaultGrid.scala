@@ -1,8 +1,8 @@
-package grid
+package com.xebialabs.grid
 
-import exception.GridInitException
-import grid.Grid.ShotResult._
-import grid.Grid.{Ship, Shot}
+import com.xebialabs.exception.GridInitException
+import com.xebialabs.grid.Grid.ShotResult._
+import com.xebialabs.grid.Grid.{Ship, Shot}
 
 class DefaultGrid(shipsSet: Set[Ship], rows: Int, columns: Int) extends Grid {
   val size = (rows, columns)
@@ -10,10 +10,13 @@ class DefaultGrid(shipsSet: Set[Ship], rows: Int, columns: Int) extends Grid {
   private var _ships = shipsSet
   private var hitSet = Set.empty[Shot]
   private var missedSet = Set.empty[Shot]
+  private var _killed = 0
 
   def hit = hitSet
 
   def missed = missedSet
+
+  def killed = _killed
 
   def ships = _ships
 
@@ -28,6 +31,7 @@ class DefaultGrid(shipsSet: Set[Ship], rows: Int, columns: Int) extends Grid {
         if ((newShip.size < ship.size) && newShip.isEmpty) {
           _ships = _ships.filter(!_.contains(shot))
           hitSet += shot
+          _killed += 1
           Kill
         }
         else {

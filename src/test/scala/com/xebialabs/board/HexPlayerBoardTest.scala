@@ -1,8 +1,8 @@
-package board
+package com.xebialabs.board
 
-import _root_.exception.HexConversionException
-import grid.Grid.ShotResult._
-import grid.HexGrid
+import com.xebialabs.exception.HexConversionException
+import com.xebialabs.grid.Grid.ShotResult._
+import com.xebialabs.grid.HexGrid
 import org.scalatest._
 
 import scala.collection.mutable.ArrayBuffer

@@ -1,7 +1,7 @@
-package board
+package com.xebialabs.board
 
-import grid.Grid.ShotResult._
-import grid.Grid._
+import com.xebialabs.grid.Grid.ShotResult._
+import com.xebialabs.grid.Grid._
 
 import scala.collection.mutable.ArrayBuffer
 

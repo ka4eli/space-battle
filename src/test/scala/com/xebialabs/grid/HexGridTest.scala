@@ -1,7 +1,7 @@
-package grid
+package com.xebialabs.grid
 
-import exception.GridInitException
-import grid.Grid.ShotResult._
+import com.xebialabs.exception.GridInitException
+import com.xebialabs.grid.Grid.ShotResult._
 import org.scalatest._
 
 class HexGridTest extends FlatSpec with Matchers {
@@ -83,6 +83,22 @@ class HexGridTest extends FlatSpec with Matchers {
       val ships = Set(Set((1, 1), (2, 2)), Set((3, 3)), Set((16, 15)))
       new DefaultGrid(ships, 16, 16)
     }
+  }
+
+  "killed counter" should "be updated after kill" in {
+    val g = grid
+    g.killed should be(0)
+    val salvo = List((15, 15))
+    g.shoot(salvo)
+    g.killed should be(1)
+  }
+
+  "killed counter" should "not be updated after hit or miss" in {
+    val g = grid
+    g.killed should be(0)
+    val salvo = List((1, 1), (4, 4))
+    g.shoot(salvo)
+    g.killed should be(0)
   }
 
 }

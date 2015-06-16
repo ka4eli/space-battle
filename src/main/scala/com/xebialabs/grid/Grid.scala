@@ -1,4 +1,4 @@
-package grid
+package com.xebialabs.grid
 
 trait Grid {
   import Grid.ShotResult.ShotResult
