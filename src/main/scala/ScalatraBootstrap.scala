@@ -1,14 +1,19 @@
 import javax.servlet.ServletContext
 
-import _root_.akka.actor.{ActorSystem, Props}
-import controller.{ProtocolController, UserController}
+import _root_.akka.actor.ActorSystem
+import com.xebialabs.controller.{ProtocolController, UserController}
+import com.xebialabs.models.User
+import com.xebialabs.processing.{AsyncWebClient, Receptionist}
 import org.scalatra._
-import processing.Receptionist
+
+import scala.util.Random
 
 class ScalatraBootstrap extends LifeCycle {
   val system = ActorSystem("XL-spaceship")
-  val receptionist = system.actorOf(Props[Receptionist])
+  val receptionist = system.actorOf(Receptionist.props(AsyncWebClient))
 
+  val id = Random.nextInt()
+  receptionist ! User("userId" + id, "name" + id)
 
   override def init(context: ServletContext) {
     context.mount(new ProtocolController(receptionist, system), "/xl-spaceship/protocol/*", "protocol")
