@@ -108,14 +108,10 @@ class SpaceGame(user: User,
     }
   }
 
-  implicit class Regex(sc: StringContext) {
-    def r = new util.matching.Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
-  }
-
   def cannons = rule match {
     case "standard" | "super-charge" => playerBoard.shipsAlive
-    case r"([1-9]|10)-shot" => rule.split("-").head.toInt
     case "desperation" => 1 + playerBoard.shipsKilled
+    case x if x.matches("([1-9]|10)-shot") => rule.split("-").head.toInt
   }
 }
 

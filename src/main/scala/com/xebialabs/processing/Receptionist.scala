@@ -18,11 +18,12 @@ class Receptionist(webClient: WebClient) extends Actor {
   val rand = Random
   var counter = rand.nextInt(10000) //todo
 
+  val rulesRegex = List("standard", "desperation", "super-charge", "([1-9]|10)-shot")
+
   def receive = awaitingForUser
 
   def active(user: User): Receive = {
 
-    //Protocol: requested for a new game by potential opponent
     case g@NewGameRequest(oid, ofn, remote, rules) =>
       //todo make unique
       val gameId = "game_" + counter
@@ -31,8 +32,8 @@ class Receptionist(webClient: WebClient) extends Actor {
       val starting = if (rand.nextBoolean()) user.userId else oid
 
       val spaceGame = context.actorOf(SpaceGame.props(user, User(oid, ofn), gameId, remote,
-        starting == user.userId, rules.getOrElse("standard"), webClient))
-      log.info(s"New game $gameId started between ${user.userId} and $oid. Starting is $starting")
+        starting == user.userId, getRules(rules), webClient))
+      log.info(s"New game $gameId with rules [${getRules(rules)}}] started between ${user.userId} and $oid. Starting is $starting")
       games += gameId -> spaceGame
 
       sender ! NewGameResponse(user.userId, user.fullName, gameId, starting, rules)
@@ -76,8 +77,8 @@ class Receptionist(webClient: WebClient) extends Actor {
     //Challenger: received positive response for game challenging
     case (NewGameResponse(oid, ofn, gameId, starting, rules), remote: SpaceshipProtocol) =>
       val spaceGame = context.actorOf(SpaceGame.props(user, User(oid, ofn), gameId,
-        remote, starting == user.userId, rules.getOrElse("standard"), webClient))
-      log.info(s"New game $gameId started between ${user.userId} and $oid. Starting is $starting")
+        remote, starting == user.userId, getRules(rules), webClient))
+      log.info(s"New game $gameId with rules [${getRules(rules)}}] started between ${user.userId} and $oid. Starting is $starting")
       games += gameId -> spaceGame
 
     case a@Auto(gameId) =>
@@ -98,6 +99,10 @@ class Receptionist(webClient: WebClient) extends Actor {
     case _ => sender ! NoUser
   }
 
+  def getRules(rules: Option[String]): String = rules match {
+    case Some(x) if rulesRegex.exists(x.matches) => x
+    case _ => "standard"
+  }
 }
 
 object Receptionist {
