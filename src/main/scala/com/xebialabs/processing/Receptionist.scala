@@ -33,7 +33,7 @@ class Receptionist(webClient: WebClient) extends Actor {
 
       val spaceGame = context.actorOf(SpaceGame.props(user, User(oid, ofn), gameId, remote,
         starting == user.userId, getRules(rules), webClient))
-      log.info(s"New game $gameId with rules [${getRules(rules)}}] started between ${user.userId} and $oid. Starting is $starting")
+      log.info(s"New game $gameId with rules [${getRules(rules)}] started between ${user.userId} and $oid. Starting is $starting")
       games += gameId -> spaceGame
 
       sender ! NewGameResponse(user.userId, user.fullName, gameId, starting, rules)
@@ -78,7 +78,7 @@ class Receptionist(webClient: WebClient) extends Actor {
     case (NewGameResponse(oid, ofn, gameId, starting, rules), remote: SpaceshipProtocol) =>
       val spaceGame = context.actorOf(SpaceGame.props(user, User(oid, ofn), gameId,
         remote, starting == user.userId, getRules(rules), webClient))
-      log.info(s"New game $gameId with rules [${getRules(rules)}}] started between ${user.userId} and $oid. Starting is $starting")
+      log.info(s"New game $gameId with rules [${getRules(rules)}] started between ${user.userId} and $oid. Starting is $starting")
       games += gameId -> spaceGame
 
     case a@Auto(gameId) =>
