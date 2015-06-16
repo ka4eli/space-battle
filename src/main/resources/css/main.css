@@ -43,6 +43,10 @@ body {
     background-color: red;
 }
 
+.row-item.missed {
+    background-color: indigo;
+}
+
 .row-item.clickable{
 
 }
