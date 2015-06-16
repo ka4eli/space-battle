@@ -44,6 +44,11 @@ class SpaceGame(user: User,
       if (!isMyTurn) {
         Try(playerBoard.processSalvo(salvo)) match {
           case Success(res) =>
+
+            println("Got: " + salvo)
+            println(playerBoard.board2String)
+            println(enemyBoard.board2String)
+
             if (playerBoard.shipsAlive < 1) {
               val gameState = Game(None, Some(opponent.userId))
               context.parent !(gid, GameStatus(player, enemy, gameState))
@@ -65,6 +70,11 @@ class SpaceGame(user: User,
     //Shooter: response from my fire
     case s@SalvoResponse(salvo, gameState) =>
       enemyBoard.processShotResults(salvo.toList)
+
+      println("Send: " + salvo)
+      println(playerBoard.board2String)
+      println(enemyBoard.board2String)
+
       if (gameState.won.isEmpty) {
         val isMyTurn = gameState.playerTurn.get == user.userId
         context.become(playing(isMyTurn))
@@ -80,14 +90,20 @@ class SpaceGame(user: User,
 
     //User: retrieving game status
     case s@Status(_) =>
-      println(playerBoard.board2String)
-      println(enemyBoard.board2String)
       val turn = if (isMyTurn) user.userId else opponent.userId
       sender ! GameStatus(player, enemy, Game(Some(turn)))
 
     case Auto(_) =>
       auto = true
       sender ! Done
+//      if (isMyTurn) autopilot ! Shoot(cannons)
+      import scala.concurrent.duration._
+      import context.dispatcher
+      context.system.scheduler.schedule(0 milliseconds, 500 milliseconds, self, AutoReminder)
+
+    case AutoReminder =>
+      if (isMyTurn) autopilot ! Shoot(cannons)
+
   }
 
   def player = UserBoard(user.userId, playerBoard.board.map(_.mkString).toList)
@@ -129,5 +145,7 @@ object SpaceGame {
   case object WrongTurn
 
   case object Done
+
+  case object AutoReminder
 
 }

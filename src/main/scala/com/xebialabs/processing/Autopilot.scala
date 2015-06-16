@@ -1,6 +1,6 @@
 package com.xebialabs.processing
 
-import akka.actor.{Props, Actor}
+import akka.actor.{Actor, Props}
 import com.xebialabs.board.{HexConversions, HexEnemyBoard}
 import com.xebialabs.processing.HexAutopilot.Shoot
 import com.xebialabs.processing.Receptionist.Fire
@@ -16,7 +16,7 @@ class HexAutopilot(enemyBoard: HexEnemyBoard, gameId: String) extends Actor with
 
   def receive = {
     case Shoot(n) => context.parent ! Fire(gameId, salvo(n))
-    case _ =>
+    case x => context.parent ! x
   }
 
   def salvo(n: Int): List[String] = {
