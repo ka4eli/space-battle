@@ -14,6 +14,7 @@ import com.xebialabs.ship.DefaultShipsGenerator
 import org.slf4j.LoggerFactory
 
 import scala.util.{Failure, Success, Try}
+import scala.concurrent.duration._
 
 class SpaceGame(user: User,
                 opponent: User,
@@ -96,8 +97,6 @@ class SpaceGame(user: User,
     case Auto(_) =>
       auto = true
       sender ! Done
-//      if (isMyTurn) autopilot ! Shoot(cannons)
-      import scala.concurrent.duration._
       import context.dispatcher
       context.system.scheduler.schedule(0 milliseconds, 500 milliseconds, self, AutoReminder)
 
