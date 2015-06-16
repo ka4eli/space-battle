@@ -16,8 +16,8 @@ class HexEnemyBoard extends EnemyBoard[String, String] with HexConversions {
 
   def board = {
     val buf = ArrayBuffer.fill(size._1)(ArrayBuffer.fill(size._2)("."))
-    hit.foreach(x => buf(x._1)(x._2) = "X")
     missed.foreach(x => buf(x._1)(x._2) = "-")
+    hit.foreach(x => buf(x._1)(x._2) = "X")
     buf.map(_.toVector).toVector
   }
 
