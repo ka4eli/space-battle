@@ -2,9 +2,8 @@ package com.xebialabs.processing
 
 import akka.actor._
 import com.xebialabs.board.{HexEnemyBoard, HexPlayerBoard}
-import com.xebialabs.grid.Grid.{Ship, ShotResult}
-import com.xebialabs.grid.Grid.ShotResult.ShotResult
-import com.xebialabs.grid.Grid.ShotResult._
+import com.xebialabs.grid.Grid.ShotResult
+import com.xebialabs.grid.Grid.ShotResult.{ShotResult, _}
 import com.xebialabs.grid.HexGrid
 import com.xebialabs.models.{SpaceshipProtocol, User}
 import com.xebialabs.processing.HexAutopilot.Shoot
@@ -14,7 +13,6 @@ import com.xebialabs.ship.DefaultShipsGenerator
 import org.slf4j.LoggerFactory
 
 import scala.util.{Failure, Success, Try}
-import scala.concurrent.duration._
 
 class SpaceGame(user: User,
                 opponent: User,
@@ -46,7 +44,6 @@ class SpaceGame(user: User,
         Try(playerBoard.processSalvo(salvo)) match {
           case Success(res) =>
 
-            println("Got: " + salvo)
             println(playerBoard.board2String)
             println(enemyBoard.board2String)
 
@@ -59,7 +56,7 @@ class SpaceGame(user: User,
                 if (rule == "super-charge" && res.map(_._2).contains(ShotResult.Kill)) opponent.userId
                 else user.userId
               sender ! SalvoResponse(reduceDuplicates(res), Game(Some(next)))
-              context.become(playing(true))
+              context.become(playing(user.userId == next))
               if (auto) autopilot ! Shoot(cannons)
             }
 
@@ -72,7 +69,6 @@ class SpaceGame(user: User,
     case s@SalvoResponse(salvo, gameState) =>
       enemyBoard.processShotResults(salvo.toList)
 
-      println("Send: " + salvo)
       println(playerBoard.board2String)
       println(enemyBoard.board2String)
 
@@ -97,12 +93,7 @@ class SpaceGame(user: User,
     case Auto(_) =>
       auto = true
       sender ! Done
-      import context.dispatcher
-      context.system.scheduler.schedule(0 milliseconds, 500 milliseconds, self, AutoReminder)
-
-    case AutoReminder =>
       if (isMyTurn) autopilot ! Shoot(cannons)
-
   }
 
   def player = UserBoard(user.userId, playerBoard.board.map(_.mkString).toList)
@@ -144,7 +135,5 @@ object SpaceGame {
   case object WrongTurn
 
   case object Done
-
-  case object AutoReminder
 
 }
