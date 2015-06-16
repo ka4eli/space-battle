@@ -38,3 +38,5 @@ class DefaultShipsGenerator(size: (Int, Int)) extends ShipsGenerator {
   private def rotations(s: Spaceship) = Set(s.toUp, s.toDown, s.toLeft, s.toRight)
 
 }
+
+object HexShipGenerator extends DefaultShipsGenerator(16, 16)
