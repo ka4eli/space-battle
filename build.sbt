@@ -16,5 +16,5 @@ libraryDependencies ++= Seq(
   "org.eclipse.jetty" % "jetty-webapp" % "9.1.5.v20140505" /*% "compile;container"*/,
   "org.eclipse.jetty" % "jetty-plus" % "9.1.5.v20140505" /*% "compile;container"*/ ,
   "ch.qos.logback" % "logback-classic" % "1.1.3",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.2"
+  "com.ning" % "async-http-client" % "1.9.27"
 )
