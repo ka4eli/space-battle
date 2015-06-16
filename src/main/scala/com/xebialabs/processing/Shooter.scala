@@ -33,15 +33,12 @@ class Shooter(remote: SpaceshipProtocol, gameId: String, webClient: WebClient) e
       val salvoResponse = parse(r.getResponseBody).camelizeKeys.extract[SalvoResponse]
       context.parent ! salvoResponse
       caller ! salvoResponse
-      context.stop(self)
 
     case (r: Response, caller: ActorRef) =>
       caller ! r.getResponseBody
-      context.stop(self)
 
     case (e: Status.Failure, caller: ActorRef) =>
       caller ! AsyncWebClientError
-      context.stop(self)
   }
 }
 
