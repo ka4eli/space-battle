@@ -44,8 +44,8 @@ class SpaceGame(user: User,
         Try(playerBoard.processSalvo(salvo)) match {
           case Success(res) =>
 
-            println(playerBoard.board2String)
-            println(enemyBoard.board2String)
+            log.info(playerBoard.board2String)
+            log.info(enemyBoard.board2String)
 
             if (playerBoard.shipsAlive < 1) {
               val gameState = Game(None, Some(opponent.userId))
@@ -69,8 +69,8 @@ class SpaceGame(user: User,
     case s@SalvoResponse(salvo, gameState) =>
       enemyBoard.processShotResults(salvo.toList)
 
-      println(playerBoard.board2String)
-      println(enemyBoard.board2String)
+      log.info(playerBoard.board2String)
+      log.info(enemyBoard.board2String)
 
       if (gameState.won.isEmpty) {
         val isMyTurn = gameState.playerTurn.get == user.userId
