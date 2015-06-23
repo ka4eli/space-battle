@@ -33,38 +33,38 @@ trait SimpleHexAutopilot extends Autopilot[String] with RandomSalvo {
 trait SmartHexAutopilot extends Autopilot[String] with RandomSalvo with ShipsUtils {
 
   def salvo(n: Int): List[String] = {
-    def takeNoMoreThanNShoots(l: List[Ship], n: Int, acc: Set[Shot] = Set()): Set[Shot] = {
-      if (l.isEmpty || n < 0) acc
+    def takeNoMoreThanNShoots(l: List[Ship], i: Int, acc: List[Shot] = Nil): List[Shot] = {
+      if (l.isEmpty || i < 0) acc
       else {
-        val newAcc = l.head ++ acc
-        val newN = n - (newAcc.size - acc.size)
+        val newAcc = (acc ::: l.head.toList).distinct
+        val newN = i - (newAcc.size - acc.size)
         takeNoMoreThanNShoots(l.tail, newN, newAcc.take(n))
       }
     }
 
-    def loop(n: Int, hitList: List[Shot], acc: List[Shot] = Nil): List[Shot] = {
-      if (n == 0 || hitList.isEmpty) acc
-      else {
-        val unknownFields = (for {
-          i <- 0 to enemyBoard.size._1 - 1
-          j <- 0 to enemyBoard.size._1 - 1
-          if !enemyBoard.missed.contains(i, j)
-        } yield (i, j)).toList
+    def smartSalvo(n: Int): List[Shot] = {
+      val hitList = enemyBoard.hit.toList
 
-        val allRotations = unknownFields.flatMap(f => types.map(_(f))).flatMap(rotations).filter(_.contains(hitList.head)).filterNot(_.forall(enemyBoard.hit.contains))
-        val safe = allRotations.filter(ship => isSafe(ship, enemyBoard.size, enemyBoard.missed))
-        val mostProbable = safe.map(s => (s, s.count(enemyBoard.hit.contains))).sortBy(_._2).reverse.map(_._1)
+      val unknownFields = (for {
+        i <- 0 to enemyBoard.size._1 - 1
+        j <- 0 to enemyBoard.size._1 - 1
+        if !enemyBoard.missed.contains(i, j)
+      } yield (i, j)).toList
 
-        val xTaken = takeNoMoreThanNShoots(mostProbable.map(_.diff(enemyBoard.hit)), n)
+      val hitRotations = unknownFields.flatMap(f => types.map(_(f))).flatMap(rotations).filterNot(_.intersect(hitList.toSet).isEmpty).filterNot(_.forall(enemyBoard.hit.contains))
+      val safe = hitRotations.filter(ship => isSafe(ship, enemyBoard.size, enemyBoard.missed))
+      val ordered = safe.sortBy(-1 * _.count(enemyBoard.hit.contains))
+//      if (ordered.nonEmpty) println(s" mostprobable item: ${ordered.head}")
+//      println(s" mostprobables size: ${ordered.size}")
+      val diffedWithHit = ordered.map(_.diff(enemyBoard.hit))
+//      if (diffedWithHit.nonEmpty) println(s" diffedWithHit: ${diffedWithHit.head}")
 
-        val shoots = xTaken.toList.filterNot(enemyBoard.hit.contains)
-        if (shoots.size >= n) shoots.take(n) ::: acc
-        else loop(n - shoots.size, hitList.tail, shoots ::: acc)
-      }
+      takeNoMoreThanNShoots(diffedWithHit, n)
     }
 
-    val smart = loop(n, enemyBoard.hit.toList)
-    println(s"Smart size is: ${smart.size}")
+    val smart = smartSalvo(n)
+//    println(s"Smart size is: ${smart.size}")
+//    println(s"Smart salvo is: $smart")
     if (smart.size < n) smart.map(shotToHex) ::: randomSalvo(n - smart.size, smart)
     else smart.map(shotToHex)
   }
