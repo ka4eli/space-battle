@@ -6,9 +6,9 @@ import com.xebialabs.grid.Grid.ShotResult
 import com.xebialabs.grid.Grid.ShotResult.{ShotResult, _}
 import com.xebialabs.grid.HexGrid
 import com.xebialabs.models.{SpaceshipProtocol, User}
-import com.xebialabs.processing.HexAutopilot.Shoot
 import com.xebialabs.processing.Receptionist.{Status, _}
 import com.xebialabs.processing.Shooter.Salvo
+import com.xebialabs.processing.SpaceAutopilot.PrepareAndFire
 import com.xebialabs.ship.DefaultShipsGenerator
 import org.slf4j.LoggerFactory
 
@@ -31,7 +31,7 @@ class SpaceGame(user: User,
   val enemyBoard = new HexEnemyBoard
   var auto = false
 
-  lazy val autopilot = context.actorOf(HexAutopilot.props(enemyBoard, gameId))
+  lazy val autopilot = context.actorOf(SpaceAutopilot.props(enemyBoard, gameId))
   lazy val shooter = context.actorOf(Shooter.props(remote, gameId, webClient))
 
   def receive = playing(isFirst)
@@ -44,8 +44,7 @@ class SpaceGame(user: User,
         Try(playerBoard.processSalvo(salvo)) match {
           case Success(res) =>
 
-            log.info(playerBoard.board2String)
-            log.info(enemyBoard.board2String)
+            log.info("\n" + playerBoard.board2String)
 
             if (playerBoard.shipsAlive < 1) {
               val gameState = Game(None, Some(opponent.userId))
@@ -57,7 +56,7 @@ class SpaceGame(user: User,
                 else user.userId
               sender ! SalvoResponse(reduceDuplicates(res), Game(Some(next)))
               context.become(playing(user.userId == next))
-              if (auto) autopilot ! Shoot(cannons)
+              if (auto) autopilot ! PrepareAndFire(cannons)
             }
 
           case Failure(e) => sender ! SalvoError(s, e)
@@ -69,15 +68,15 @@ class SpaceGame(user: User,
     case s@SalvoResponse(salvo, gameState) =>
       enemyBoard.processShotResults(salvo.toList)
 
-      log.info(playerBoard.board2String)
-      log.info(enemyBoard.board2String)
+      log.info("\n" + enemyBoard.board2String)
 
       if (gameState.won.isEmpty) {
         val isMyTurn = gameState.playerTurn.get == user.userId
         context.become(playing(isMyTurn))
-        if (isMyTurn && auto) autopilot ! Shoot(cannons)
+        if (isMyTurn && auto) autopilot ! PrepareAndFire(cannons)
+      } else {
+        context.parent !(gameId, GameStatus(player, enemy, gameState))
       }
-      else context.parent !(gameId, GameStatus(player, enemy, gameState))
 
     //User: trying to fire
     case f@Fire(gid, salvo) =>
@@ -93,7 +92,7 @@ class SpaceGame(user: User,
     case Auto(_) =>
       auto = true
       sender ! Done
-      if (isMyTurn) autopilot ! Shoot(cannons)
+      if (isMyTurn) autopilot ! PrepareAndFire(cannons)
   }
 
   def player = UserBoard(user.userId, playerBoard.board.map(_.mkString).toList)
