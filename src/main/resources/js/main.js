@@ -4,9 +4,9 @@
     var BOARD_COLUMNS = 16;
 
     var SERVER = 'http://localhost:8080/xl-spaceship';
-    var game_id = "game_820";
-    var user_id = "";
+    var game_id = "";
     var isPlaying = false;
+    var fires = {};
 
     function generateBoard(cl, b) {
         var z = b.map(function (c) {
@@ -46,8 +46,13 @@
         var $player = $('#player');
         var $enemy = $('#enemy');
         var $fireButton = $('#fire');
+        $player.empty();
+        $enemy.empty();
+        $player.attr('onclick', '').unbind('click');
+        $enemy.attr('onclick', '').unbind('click');
+        $fireButton.attr('onclick', '').unbind('click');
 
-        var fires = {};
+        fires = {};
 
         getState(game_id).then(function (responce) {
             $player.append(generateBoard(" unclickable", responce.self.board));
@@ -88,8 +93,6 @@
             var $target = $(event.target);
             var x = intToHex($target.data('x'));
             var y = intToHex($target.data('y'));
-
-            //if ($target.hasClass('row-item')) {
             if ($target.hasClass('clickable')) {
                 $target.toggleClass('active');
                 if ($target.hasClass('active')) {
@@ -121,22 +124,34 @@
         //setTimeout(refreshPlayer, 500);
     }
 
+    function getGameList() {
+        return $.ajax({
+            method: 'GET',
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            url: SERVER + '/user/games'
+        });
+    }
+
     function waiting() {
         var $hello = $('#hello');
         var $available_games = $('#available_games');
+        $available_games.on('click', onGameJoin);
         var $fireButton = $('#fire');
         $fireButton.hide();
-        $hello.append('<p>Waiting for game</p>')
-        $available_games.append('<a href="#">game_821</a>')
-        $available_games.on('click', onGameJoin);
+        $hello.append('<p>Waiting for game</p>');
+
+        getGameList().then(function (games_list) {
+            for (var i = 0; i < games_list.length; i++) {
+                $available_games.append('<a href="#">' + games_list[i] + '</a><br>')
+            }
+        });
 
 
         function onGameJoin(event) {
             var $target = $(event.target);
-            console.log($target);
             game_id = $target[0].innerHTML;
             $hello.empty();
-            $available_games.empty();
             $fireButton.show();
             isPlaying = true;
             init();
