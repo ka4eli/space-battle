@@ -1,0 +1,24 @@
+Distributed game, similar to "sea battle". All documentation is in space.pdf
+As for now implemented all features, except visual interface. Also added smart autopilot.
+To play just follow the REST protocol described in space.pdf.
+
+
+Although you can use not fully implemented web interface.
+Instructions to run it:
+
+
+1. Launch 2 game instances (you can use JettyLauncher.scala, port config is in application.conf)
+
+2. Send challenge request via SpaceClient.scala sendChallenge
+
+3. To play with AI send auto request to opponent server address via SpaceClient.scala sendAuto
+
+2. In main.js change
+    var host = 'localhost';
+    var port = 8080;
+
+    to your host and port
+
+3. Run index.html in browser and choose your game
+
+Now you can choose coordinates and make shot, but you can't see how much cannons you have
