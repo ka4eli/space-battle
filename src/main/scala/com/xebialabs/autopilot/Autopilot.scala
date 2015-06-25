@@ -43,28 +43,21 @@ trait SmartHexAutopilot extends Autopilot[String] with RandomSalvo with ShipsUti
     }
 
     def smartSalvo(n: Int): List[Shot] = {
-      val hitList = enemyBoard.hit.toList
-
       val unknownFields = (for {
         i <- 0 to enemyBoard.size._1 - 1
         j <- 0 to enemyBoard.size._1 - 1
         if !enemyBoard.missed.contains(i, j)
-      } yield (i, j)).toList
+      } yield (i, j)).view
 
-      val hitRotations = unknownFields.flatMap(f => types.map(_(f))).flatMap(rotations).filterNot(_.intersect(hitList.toSet).isEmpty).filterNot(_.forall(enemyBoard.hit.contains))
-      val safe = hitRotations.filter(ship => isSafe(ship, enemyBoard.size, enemyBoard.missed))
+      val hitRotations = unknownFields.flatMap(f => types.map(_(f))).flatMap(rotations).filterNot(_.intersect(enemyBoard.hit).isEmpty).filterNot(_.forall(enemyBoard.hit.contains))
+      val safe = hitRotations.filter(isSafe(_, enemyBoard.size, enemyBoard.missed))
       val ordered = safe.sortBy(-1 * _.count(enemyBoard.hit.contains))
-//      if (ordered.nonEmpty) println(s" mostprobable item: ${ordered.head}")
-//      println(s" mostprobables size: ${ordered.size}")
       val diffedWithHit = ordered.map(_.diff(enemyBoard.hit))
-//      if (diffedWithHit.nonEmpty) println(s" diffedWithHit: ${diffedWithHit.head}")
 
-      takeNoMoreThanNShoots(diffedWithHit, n)
+      takeNoMoreThanNShoots(diffedWithHit.toList, n)
     }
 
     val smart = smartSalvo(n)
-//    println(s"Smart size is: ${smart.size}")
-//    println(s"Smart salvo is: $smart")
     if (smart.size < n) smart.map(shotToHex) ::: randomSalvo(n - smart.size, smart)
     else smart.map(shotToHex)
   }
