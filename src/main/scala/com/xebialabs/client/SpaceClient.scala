@@ -61,18 +61,20 @@ object SpaceClient extends App {
     println(res.getStatusCode)
   }
 
+  val availableRules = List("standard", "desperation", "super-charge") ++ (1 to 10).map(_ + "-shot")
+  println(availableRules)
 
   val player = SpaceshipProtocol("localhost", 8080)
   val opponent = SpaceshipProtocol("localhost", 8081)
 
   val gameId = sendChallenge(player, opponent, Some("standard"))
 
-//  sendAuto(player, gameId)
   sendAuto(opponent, gameId)
+  //  sendAuto(player, gameId)
 
-//  val salvo = Salvo(List("5x1"))
-//  sendFire(player, gameId, salvo)
-//  sendStatus(player, gameId)
+  //  val salvo = Salvo(List("5x1"))
+  //  sendFire(player, gameId, salvo)
+  //  sendStatus(player, gameId)
 
 
   asyncHttpClient.close()
