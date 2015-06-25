@@ -12,9 +12,10 @@ object JettyLauncher {
     val server = new Server(port)
     val context = new WebAppContext()
     context setContextPath "/"
-    context.setResourceBase("src/webapp")
+    context.setResourceBase("src/main/resources")
     context.addEventListener(new ScalatraListener)
     context.addServlet(classOf[DefaultServlet], "/")
+    context.setWelcomeFiles(Array("index.html"))
 
     server.setHandler(context)
 
