@@ -92,6 +92,10 @@ class Receptionist(webClient: WebClient) extends Actor {
       games = Map()
       finishedGames = Map()
       context.unbecome()
+
+    case GetGames =>
+      sender ! GamesList(games.keys.toList)
+
   }
 
   def awaitingForUser: Receive = {
@@ -128,5 +132,9 @@ object Receptionist {
   case class UserBoard(userId: String, board: List[String])
 
   case class Auto(gameId: String)
+
+  case class GamesList(games: List[String])
+
+  case object GetGames
 
 }
