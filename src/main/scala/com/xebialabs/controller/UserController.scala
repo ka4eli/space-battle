@@ -22,6 +22,12 @@ class UserController(receptionist: ActorRef, system: ActorSystem)
 
   //todo implement auth
 
+  get("/games") {
+    receptionist ? GetGames map {
+      case GamesList(games) => games
+    }
+  }
+
   get("/game/:id") {
     val gameId = params("id")
 

@@ -3,7 +3,10 @@
     var BOARD_ROWS = 16;
     var BOARD_COLUMNS = 16;
 
-    var SERVER = 'http://localhost:8080/xl-spaceship';
+    var host = 'localhost';
+    var port = 8080;
+
+    var SERVER = 'http://' + host + ':' + port + '/xl-spaceship';
     var game_id = "";
     var isPlaying = false;
     var fires = {};
