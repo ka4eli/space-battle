@@ -137,12 +137,19 @@
     }
 
     function waiting() {
+        var $host = $('#host');
+        var $port = $('#port');
+        var $rules = $('#rules');
+        var $ask = $('#ask');
+
+        $ask.on('click', onAskItemClicked);
+
+
         var $hello = $('#hello');
         var $available_games = $('#available_games');
         $available_games.on('click', onGameJoin);
         var $fireButton = $('#fire');
         $fireButton.hide();
-        $hello.append('<p>Waiting for game</p>');
 
         getGameList().then(function (games_list) {
             for (var i = 0; i < games_list.length; i++) {
@@ -154,11 +161,38 @@
         function onGameJoin(event) {
             var $target = $(event.target);
             game_id = $target[0].innerHTML;
+            $('#challenge').hide();
             $hello.empty();
             $fireButton.show();
             isPlaying = true;
             init();
 
+        }
+
+        function onAskItemClicked() {
+            var h = $host.val();
+            var p = parseInt($port.val());
+            var r = $rules.val();
+
+            sendChallenge(h, p, r).then(function (resp) {
+                console.log(resp);
+            });
+        }
+
+        function sendChallenge(h, p, r) {
+            return $.ajax({
+                method: 'POST',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                url: SERVER + '/user/game/new',
+                data: JSON.stringify({
+                    spaceshipProtocol: {
+                        hostname: h,
+                        port: p
+                    },
+                    rules: r
+                })
+            });
         }
     }
 

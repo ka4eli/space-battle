@@ -21,6 +21,34 @@ body {
     margin: 40px 50px;
 }
 
+#challenge {
+    position: absolute;
+    left: 100px;
+}
+
+label {
+    float: left;
+    padding: 3px;
+}
+
+select {
+    float: left;
+    padding: 3px;
+}
+
+#ask {
+    display: inline-block;
+    vertical-align: top;
+    font-size: 16px;
+    text-align: center;
+    line-height: 16px;
+    background-color: greenyellow;
+    width: 120px;
+    height: 33px;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 40px 50px;
+}
 
 .row-item {
     margin: 0 2px;
@@ -47,9 +75,10 @@ body {
     background-color: indigo;
 }
 
-.row-item.clickable{
+.row-item.clickable {
 
 }
-.row-item.unclickable{
+
+.row-item.unclickable {
 
 }
