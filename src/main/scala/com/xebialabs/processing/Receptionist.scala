@@ -64,7 +64,7 @@ class Receptionist(webClient: WebClient) extends Actor {
     //User: trying to challenge another player
     case ChallengeGame(remote, r) =>
       val req = NewGameRequest(user.userId, user.fullName, SpaceshipProtocol(Configuration.host, Configuration.port), r)
-      context.actorOf(Challenger.props(remote, req, sender(), webClient)) ! req
+      context.actorOf(Challenger.props(remote, req, sender(), webClient))
 
     //User: trying to fire
     case f@Fire(gameId, _) =>
