@@ -9,7 +9,7 @@ Instructions to run it:
 
 1. Launch 2 game instances (you can use JettyLauncher.scala, port config is in application.conf)
 
-2. Send challenge request via SpaceClient.scala sendChallenge
+2. Send challenge request via SpaceClient.scala sendChallenge or via web interface
 
 3. To play with AI send auto request to opponent server address via SpaceClient.scala sendAuto
 
